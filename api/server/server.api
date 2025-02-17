@@ -1,0 +1,149 @@
+syntax = "v1"
+
+type Request {
+	Name string `path:"name,options=you|me"`
+}
+
+type Response {
+	Message string `json:"message"`
+}
+
+type CreateWalletHandlerRequest {
+	Blockchain string `json:"backchain"`
+}
+
+type CreateWalletHandlerResponse {
+	Address string `json:"address"`
+}
+
+type ImportWalletHandlerRequest {
+	Blockchain string `json:"backchain"`
+	PrivateKey string `json:"privateKey"`
+}
+
+type ImportWalletHandlerResponse {
+	Address string `json:"address"`
+}
+
+type WalletInfoRequest {
+	Blockchain string `json:"backchain"`
+	Address    string `json:"address"`
+}
+
+type WalletInfoResponse {
+	Address string `json:"address"`
+	Balance string `json:"balance"`
+	Defi    []Defi `json:"Defi"`
+}
+
+type Defi {
+	Name     string `json:"name"`
+	Amount   string `json:"amount"`
+	Contract string `json:"contract"`
+}
+
+type WalletTransactionHandlerRequest {
+	Page     int64 `json:"page"`
+	PageSize int64 `json:"pageSize"`
+}
+
+type WalletTransactionHandlerResponse {
+	TransacteList []Transaction `json:"transacteList"`
+}
+
+type Transaction {
+	Hash  string `json:"hash"`
+	From  string `json:"from"`
+	To    string `json:"to"`
+	Value string `json:"value"`
+	Fee   string `json:"fee"`
+	Time  string `json:"time"`
+}
+
+type WalletTransactionDetailHandlerRequest {
+	Hash string `json:"hash"`
+}
+
+type WalletTransactionDetailHandlerResponse {
+	From  string `json:"from"`
+	To    string `json:"to"`
+	Value string `json:"value"`
+	Fee   string `json:"fee"`
+	Time  string `json:"time"`
+}
+
+type WalletTransferHandlerRequest {
+	Blockchain string `json:"backchain"`
+	PrivateKey string `json:"privateKey"`
+	From       string `json:"from"`
+	To         string `json:"to"`
+	Value      string `json:"value"`
+	Fee        string `json:"fee"`
+}
+
+type WalletTransferHandlerResponse {
+	Hash string `json:"hash"`
+}
+
+type WalletDefiTransferHandlerRequest {
+	Blockchain string `json:"backchain"`
+	PrivateKey string `json:"privateKey"`
+	Contract   string `json:"contract"`
+	From       string `json:"from"`
+	To         string `json:"to"`
+	Value      string `json:"value"`
+	Fee        string `json:"fee"`
+	Name       string `json:"name,optional"`
+}
+
+type WalletDefiTransferHandlerResponse {
+	Hash string `json:"hash"`
+}
+
+type BlockChainListHandlerResponse {
+	BlockChainList []string `json:"blockChainList"`
+}
+
+service server-api {
+	//创建钱包
+	@doc "创建钱包"
+	@handler CreateWalletHandler
+	post /create/wallet (CreateWalletHandlerRequest) returns (CreateWalletHandlerResponse)
+
+	//导入钱包
+	@doc "导入钱包"
+	@handler ImportWalletHandler
+	post /import/wallet (CreateWalletHandlerRequest) returns (CreateWalletHandlerResponse)
+
+	//查询钱包信息:余额
+	@doc "查询钱包信息"
+	@handler WalletInfoHandler
+	post /wallet/info (WalletInfoRequest) returns (WalletInfoResponse)
+
+	//链上主币查询交易记录
+	@doc "查询钱包交易记录"
+	@handler WalletTransactionHandler
+	post /wallet/transaction (WalletTransactionHandlerRequest) returns (WalletTransactionHandlerResponse)
+
+	//交易详情
+	@doc "交易详情"
+	@handler WalletTransactionDetailHandler
+	post /wallet/transaction/detail (CreateWalletHandlerRequest) returns (WalletInfoResponse)
+
+	//转账
+	@doc "转账"
+	@handler WalletTransferHandler
+	post /wallet/transfer (WalletTransferHandlerRequest) returns (WalletTransferHandlerResponse)
+
+	//代币转账
+	@doc "代币转账"
+	@handler WalletDefiTransferHandler
+	post /wallet/defi/transfer (WalletDefiTransferHandlerRequest) returns (WalletDefiTransferHandlerResponse)
+
+	//链列表
+	@doc "链列表"
+	@handler BlockChainListHandler
+	post /blockchain/list returns (BlockChainListHandlerResponse)
+}
+
+//goctl api go -api server/server.api -dir server/
